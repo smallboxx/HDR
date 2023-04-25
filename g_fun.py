@@ -67,7 +67,7 @@ for i in range(N):
 x, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
 g = x[:256]
 
-# change strange value
+# change Naf value
 temp_i=0
 data_min=min(g[:20])
 for i in range(10):

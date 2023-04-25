@@ -4,7 +4,7 @@ import Imath
 import numpy as np
 import matplotlib.pyplot as plt
 # load_EXR_file
-exr_file = OpenEXR.InputFile('fromrenderjpg_linear_uniform_HDRIMG.exr')
+exr_file = OpenEXR.InputFile('data\\exr\\fromrenderjpg_linear_Gaussian_HDRIMG.exr')
 
 # get_window_size
 dw = exr_file.header()["dataWindow"]
