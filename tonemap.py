@@ -1,4 +1,4 @@
-from src.cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm,xyY_to_XYZ
+from src.cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm,xyY_to_XYZ,XYZ_to_RGB_linear
 import OpenEXR
 import Imath
 import numpy as np
@@ -14,7 +14,8 @@ def XYZ2xyY(XYZ):
     Y=Y
     return x,y,Y
 
-def photographic_tonemapping(Y, b=0.1, k=0.18, delta=1e-9):
+def photographic_tonemapping(Y,value, b=0.15, k=0.18,delta=1e-9):
+    Y=Y-value
     # Calculate the geometric mean (Im_HDR)
     Im_HDR = np.exp(np.mean(np.log(Y+delta)))
 
@@ -29,7 +30,7 @@ def photographic_tonemapping(Y, b=0.1, k=0.18, delta=1e-9):
 
     # Normalize the tonemapped image
     Y_tonemap = (I_tilde_TM / (1 + I_tilde_HDR))
-    
+    Y_tonemap = Y_tonemap
     return Y_tonemap
 
 def read_exr_to_rgb(exr_file):
@@ -68,35 +69,24 @@ def read_exr_to_rgb(exr_file):
     return rgb_data
 
 
-# # Load a linear HDR image in OpenEXR format
-# hdr_image = read_exr_to_rgb('correct_HDR.exr')
-
-# XYZ = lRGB2XYZ(hdr_image)
-
-# # plt.imshow(hdr_image)
-# # plt.title('RGB Image')
-# # plt.show()
-# # Apply photographic tonemapping
-
-# x,y,Y = XYZ2xyY(XYZ) 
-# Y_tonemap = photographic_tonemapping(Y)
-
-# X0, Y0, Z0 = xyY_to_XYZ(x,y,Y_tonemap)
-# TONEMAP_XYZ = np.dstack((X0, Y0, Z0))
-# TONEMAP_RGB = XYZ2lRGB(TONEMAP_XYZ)
-# print(TONEMAP_RGB.shape,np.max(TONEMAP_RGB))
-
-# # Save the tonemapped image as a PNG or JPEG
-# writeEXR('TONEMAP_HDR.exr',TONEMAP_RGB)
-
 # Load a linear HDR image in OpenEXR format
-hdr_image = cv2.imread('correct_HDR.exr', cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+hdr_image = read_exr_to_rgb('correct_HDR.exr')
 
+XYZ = lRGB2XYZ(hdr_image)
+X=XYZ[:,:,0]
+Y=XYZ[:,:,1]
+Z=XYZ[:,:,2]
+# plt.imshow(hdr_image)
+# plt.title('RGB Image')
+# plt.show()
 # Apply photographic tonemapping
-tonemapped_image = photographic_tonemapping(hdr_image)
+value = np.min(Y)
+TONEMAP_Y = photographic_tonemapping(Y,value)
+TONEMAP_XYZ = np.dstack([X,TONEMAP_Y,Z])
+TONEMAP_RGB = XYZ2lRGB(TONEMAP_XYZ)
 
-# Scale the tonemapped image to the range [0, 255]
-tonemapped_image_8bit = np.clip(tonemapped_image * 255, 0, 255).astype(np.uint8)
-
+plt.imshow(TONEMAP_RGB)
+plt.title('RGB Image')
+plt.show()
 # Save the tonemapped image as a PNG or JPEG
-cv2.imwrite('tonemapped_image.png', tonemapped_image_8bit)
+writeEXR('TONEMAP_HDR.exr',TONEMAP_RGB)
