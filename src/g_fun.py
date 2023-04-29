@@ -85,7 +85,7 @@ plt.title("Estimated g Function")
 plt.xlabel("Pixel Value")
 plt.ylabel("Log Exposure Time")
 plt.savefig("g_function.png")
-np.save("g_function.npy", g)
+np.save("other_files\\g_function.npy", g)
 
 
 

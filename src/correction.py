@@ -1,22 +1,10 @@
-from src.cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm
+from cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm
 import OpenEXR
 import Imath
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-
-# progress_bar
-def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(length * iteration // total)
-    bar = fill * filled_length + '-' * (length - filled_length)
-    sys.stdout.write('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix))
-    sys.stdout.flush()
-    if iteration == total:
-        sys.stdout.write('\n')
-
 # load_EXR_file
-exr_file = OpenEXR.InputFile('data\\exr\\fromrenderjpg_linear_Gaussian_HDRIMG.exr')
+exr_file = OpenEXR.InputFile('data\\exr_by_merge\\fromrenderjpg_linear_Gaussian_HDRIMG.exr')
 
 # get_window_size
 dw = exr_file.header()["dataWindow"]
@@ -53,14 +41,14 @@ cal_r=np.zeros((4,6))
 cal_g=np.zeros((4,6))
 cal_b=np.zeros((4,6))
 cal_l=np.ones((4,6))
-with open('correct_points.txt','r') as f:
+with open('other_files\\correct_points.txt','r') as f:
     lines=f.readlines()
     for i in range(len(lines)):
         row=i%4
         col=i//4
         line=lines[i].strip().split(',')
         center_point=[int(float(line[0])),int(float(line[1]))]
-        num=3600 #80*80
+        num=3600
         tempr=0
         tempg=0
         tempb=0
@@ -113,12 +101,10 @@ s_g=standard_g[3][0]/(w_g/3600)
 s_b=standard_b[3][0]/(w_b/3600)
 print(s_r,s_g,s_b)
 
-for i in range(transformed_image.shape[0]):
-    for j in range(transformed_image.shape[1]):
-        transformed_image[i, j, 0] *= s_r
-        transformed_image[i, j, 1] *= s_g
-        transformed_image[i, j, 2] *= s_b
-        print_progress_bar(i*6000+j+1,6000*4000,prefix='Progress:', suffix='Complete merge hdr', length=100)
+transformed_image[:, :, 0] *= s_r
+transformed_image[:, :, 1] *= s_g
+transformed_image[:, :, 2] *= s_b
+
 writeEXR('correct_HDR.exr',transformed_image)
 plt.imshow(transformed_image)
 plt.title('RGB Image')

@@ -1,4 +1,4 @@
-from src.cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm
+from cp_hw2 import lRGB2XYZ, XYZ2lRGB, writeEXR, read_colorchecker_gm
 import cv2
 import numpy as np
 import math
@@ -138,7 +138,7 @@ def Img_weigthting_merge(ldr_list,exposure_times,w_method="uniform",weigthting_m
 
     # save
     savename=weigthting_method+"_"+w_method+"_HDRIMG.exr"
-    cv2.imwrite('result.hdr', hdr_image)
+
     writeEXR(savename,hdr_image)
 
     return hdr_image
@@ -158,6 +158,9 @@ if __name__=="__main__":
         time_list.append(ex_time)
     exposure_times = np.array(time_list, dtype=np.float32)
 
+   # Normalize the exposure times to the range of 0-1
+    exposure_times = (exposure_times - np.min(exposure_times)) / (np.max(exposure_times) - np.min(exposure_times))+1e-8
+    print(exposure_times)
     # Convert the images and exposure times to numpy arrays
     images = np.array(images)
     exposure_times = np.array(exposure_times)
@@ -167,9 +170,9 @@ if __name__=="__main__":
     # weigthting_method="linear" or "log"
     w_method_list=["uniform","tent","Gaussian","photo"]
     weighthing_list=["linear","log"]
-    for method1 in weighthing_list:
+    for method1 in weighthing_list: 
         for method2 in w_method_list:
-            if method1=="linear":
-                print("skip")
-            else:
+            if method2=="photo":
                 hdr=Img_weigthting_merge(ldr_list=images,exposure_times=exposure_times,w_method=method2,weigthting_method=method1)
+            else:
+                print("skip")

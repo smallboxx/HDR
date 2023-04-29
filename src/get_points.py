@@ -20,7 +20,7 @@ while True:
     # 将所选点绘制在图像上
     plt.plot(x, y, 'ro',markersize=1)
     # 将所选点的坐标写入txt文件
-    with open('correct_points.txt', 'a') as f:
+    with open('other_files\\correct_points.txt', 'a') as f:
         f.write(f'{x},{y}\n')
     f.close()
 
@@ -39,7 +39,7 @@ plt.show()
 #             max_x=max(batch_x)
 #             min_y=min(batch_y)
 #             max_y=max(batch_y)
-#             with open('int_correct_points.txt','a') as nf:
+#             with open('other_files\\int_correct_points.txt','a') as nf:
 #                 nf.write(f'{min_x},{max_x},{min_y},{max_y}\n')
 #             nf.close()
 #             batch_x.clear()

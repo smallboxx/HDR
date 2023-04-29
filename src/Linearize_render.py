@@ -58,6 +58,6 @@ images=load_images(image_files=image_files)
 g_images = []
 for id in range(16):
     # 使用g函数转换为线性图像
-    filename = "linear_image_" + str(id+1) + ".jpg"
+    filename = "data\\linear_render_imgs\\linear_image_" + str(id+1) + ".jpg"
     linear_tiff_img = process_image(images[id],g_function=g,num_threads=256,idx=id)
     cv2.imwrite(filename, linear_tiff_img)
